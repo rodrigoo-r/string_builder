@@ -80,10 +80,10 @@ inline void write_char_string_builder(StringBuilder *builder, const char c)
         builder->capacity *= 2;
 
         // Reallocate immediately (+1 for null terminator)
-        char *new = (char *) realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
+        char *new_buffer = (char *) realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
 
         // Check if we got NULL
-        if (new == NULL)
+        if (new_buffer == NULL)
         {
 #       ifndef _WIN32
             perror("realloc");
@@ -93,7 +93,7 @@ inline void write_char_string_builder(StringBuilder *builder, const char c)
             exit(1);
         }
 
-        builder->buf = new;
+        builder->buf = new_buffer;
     }
 
     // Write the character to the buffer
