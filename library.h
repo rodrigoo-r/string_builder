@@ -41,7 +41,7 @@ inline void init_string_builder(StringBuilder *builder, const size_t capacity)
     builder->capacity = capacity;
 
     // Allocate a new buffer (+1 for null terminator)
-    char *buf = malloc(sizeof(char) * (capacity + 1));
+    char *buf = (char *) malloc(sizeof(char) * (capacity + 1));
 
     // Check if we got NULL
     if (buf == NULL)
@@ -80,7 +80,7 @@ inline void write_char_string_builder(StringBuilder *builder, const char c)
         builder->capacity *= 2;
 
         // Reallocate immediately (+1 for null terminator)
-        char *new = realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
+        char *new = (char *) realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
 
         // Check if we got NULL
         if (new == NULL)
