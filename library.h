@@ -123,7 +123,7 @@ inline void destroy_string_builder(StringBuilder *builder)
     builder->buf = NULL;
 }
 
-void reset_string_builder(StringBuilder *builder)
+inline void reset_string_builder(StringBuilder *builder)
 {
     destroy_string_builder(builder);
     init_string_builder(builder, builder->capacity);
