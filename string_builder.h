@@ -30,7 +30,7 @@ extern "C"
 #include <string.h>
 
 /**
- * \struct StringBuilder
+ * \struct string_builder_t
  * \brief A simple dynamic string builder for efficient string concatenation.
  *
  * This structure manages a dynamically allocated character buffer,
@@ -41,18 +41,18 @@ typedef struct
     char *buf;        /**< Pointer to the character buffer. */
     size_t idx;       /**< Current index (length) of the string. */
     size_t capacity;  /**< Total capacity of the buffer. */
-} StringBuilder;
+} string_builder_t;
 
 /**
- * \brief Initializes a StringBuilder with a given capacity.
+ * \brief Initializes a string_builder_t with a given capacity.
  *
  * Allocates memory for the buffer and sets the initial index to 0.
  * Exits the program if memory allocation fails.
  *
- * \param builder Pointer to the StringBuilder to initialize.
+ * \param builder Pointer to the string_builder_t to initialize.
  * \param capacity Initial capacity of the buffer (excluding null terminator).
  */
-inline void init_string_builder(StringBuilder *builder, const size_t capacity)
+inline void init_string_builder(string_builder_t *builder, const size_t capacity)
 {
     builder->capacity = capacity;
 
@@ -80,10 +80,10 @@ inline void init_string_builder(StringBuilder *builder, const size_t capacity)
  * Appends a null terminator at the current index and returns the buffer.
  * The caller must not free the returned pointer directly.
  *
- * \param builder Pointer to the StringBuilder.
+ * \param builder Pointer to the string_builder_t.
  * \return Pointer to the internal buffer (null-terminated string).
  */
-inline char *collect_string_builder_no_copy(const StringBuilder *builder)
+inline char *collect_string_builder_no_copy(const string_builder_t *builder)
 {
     // Add a null terminator
     builder->buf[builder->idx] = '\0';
@@ -96,25 +96,25 @@ inline char *collect_string_builder_no_copy(const StringBuilder *builder)
  * Appends a null terminator and returns a heap-allocated copy of the string.
  * The caller is responsible for freeing the returned pointer.
  *
- * \param builder Pointer to the StringBuilder.
+ * \param builder Pointer to the string_builder_t.
  * \return Newly allocated null-terminated string.
  */
-inline char *collect_string_builder(const StringBuilder *builder)
+inline char *collect_string_builder(const string_builder_t *builder)
 {
     // Copy the string
     return strdup(collect_string_builder_no_copy(builder));
 }
 
 /**
- * \brief Appends a single character to the StringBuilder.
+ * \brief Appends a single character to the string_builder_t.
  *
  * Automatically reallocates the buffer if needed.
  * Exits the program if memory allocation fails.
  *
- * \param builder Pointer to the StringBuilder.
+ * \param builder Pointer to the string_builder_t.
  * \param c Character to append.
  */
-inline void write_char_string_builder(StringBuilder *builder, const char c)
+inline void write_char_string_builder(string_builder_t *builder, const char c)
 {
     // Check if we have to reallocate the buffer
     if (builder->idx == builder->capacity)
@@ -145,14 +145,14 @@ inline void write_char_string_builder(StringBuilder *builder, const char c)
 }
 
 /**
- * \brief Appends a null-terminated string to the StringBuilder.
+ * \brief Appends a null-terminated string to the string_builder_t.
  *
  * Iterates over the input string and appends each character.
  *
- * \param builder Pointer to the StringBuilder.
+ * \param builder Pointer to the string_builder_t.
  * \param str Null-terminated string to append.
  */
-inline void write_string_builder(StringBuilder *builder, const char *str)
+inline void write_string_builder(string_builder_t *builder, const char *str)
 {
     // Iterate over the string
     while (*str != '\0')
@@ -165,13 +165,13 @@ inline void write_string_builder(StringBuilder *builder, const char *str)
 }
 
 /**
- * \brief Frees the memory used by the StringBuilder's buffer.
+ * \brief Frees the memory used by the string_builder_t's buffer.
  *
  * After calling this function, the buffer pointer is set to NULL.
  *
- * \param builder Pointer to the StringBuilder to destroy.
+ * \param builder Pointer to the string_builder_t to destroy.
  */
-inline void destroy_string_builder(StringBuilder *builder)
+inline void destroy_string_builder(string_builder_t *builder)
 {
     // Make sure the buffer is not NULL
     if (builder->buf == NULL) return;
@@ -182,13 +182,13 @@ inline void destroy_string_builder(StringBuilder *builder)
 }
 
 /**
- * \brief Resets the StringBuilder to its initial state.
+ * \brief Resets the string_builder_t to its initial state.
  *
  * Frees the current buffer and reinitializes it with the same capacity.
  *
- * \param builder Pointer to the StringBuilder to reset.
+ * \param builder Pointer to the string_builder_t to reset.
  */
-inline void reset_string_builder(StringBuilder *builder)
+inline void reset_string_builder(string_builder_t *builder)
 {
     destroy_string_builder(builder);
     init_string_builder(builder, builder->capacity);
