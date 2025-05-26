@@ -16,4 +16,4 @@
 // Created by rodrigo on 5/15/25.
 //
 
-#include "str_copy.h"
+#include "string_builder.h"

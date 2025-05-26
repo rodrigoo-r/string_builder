@@ -3,4 +3,4 @@ project(string_builder C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_library(string_builder STATIC str_copy.c)
+add_library(string_builder STATIC string_builder.c)
