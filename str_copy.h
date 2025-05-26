@@ -16,8 +16,8 @@
 // Created by rodrigo on 5/15/25.
 //
 
-#ifndef STRING_BUILDER_H
-#define STRING_BUILDER_H
+#ifndef FLUENT_LIBC_STRING_BUILDER_H
+#define FLUENT_LIBC_STRING_BUILDER_H
 
 #if defined(__cplusplus)
 extern "C"
@@ -198,4 +198,4 @@ inline void reset_string_builder(StringBuilder *builder)
 }
 #endif
 
-#endif //STRING_BUILDER_H
+#endif //FLUENT_LIBC_STRING_BUILDER_H
