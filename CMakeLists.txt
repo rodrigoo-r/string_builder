@@ -3,4 +3,4 @@ project(string_builder C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_library(string_builder STATIC include/fluent/string/string_builder.c)
+add_library(string_builder STATIC include/fluent/string_builder/string_builder.c)
