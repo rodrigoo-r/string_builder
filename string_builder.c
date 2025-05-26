@@ -16,4 +16,4 @@
 // Created by rodrigo on 5/15/25.
 //
 
-#include "string_builder.h"
+#include "include/fluent/string_builder/string_builder.h"
