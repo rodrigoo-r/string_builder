@@ -41,6 +41,7 @@ typedef struct
     char *buf;        /**< Pointer to the character buffer. */
     size_t idx;       /**< Current index (length) of the string. */
     size_t capacity;  /**< Total capacity of the buffer. */
+    double growth_factor; /**< Growth factor for buffer resizing (not used in this implementation). */
 } string_builder_t;
 
 /**
@@ -51,8 +52,9 @@ typedef struct
  *
  * \param builder Pointer to the string_builder_t to initialize.
  * \param capacity Initial capacity of the buffer (excluding null terminator).
+ * \param growth_factor Growth factor for resizing the buffer.
  */
-inline void init_string_builder(string_builder_t *builder, const size_t capacity)
+inline void init_string_builder(string_builder_t *builder, const size_t capacity, double growth_factor)
 {
     builder->capacity = capacity;
 
@@ -72,6 +74,7 @@ inline void init_string_builder(string_builder_t *builder, const size_t capacity
 
     builder->buf = buf;
     builder->idx = 0;
+    builder->growth_factor = growth_factor;
 }
 
 /**
@@ -120,7 +123,7 @@ inline void write_char_string_builder(string_builder_t *builder, const char c)
     if (builder->idx == builder->capacity)
     {
         // Double the capacity
-        builder->capacity *= 2;
+        builder->capacity *= builder->growth_factor;
 
         // Reallocate immediately (+1 for null terminator)
         char *new_buffer = (char *) realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
@@ -182,16 +185,16 @@ inline void destroy_string_builder(string_builder_t *builder)
 }
 
 /**
- * \brief Resets the string_builder_t to its initial state.
+ * \brief Resets the string builder to an empty state.
  *
- * Frees the current buffer and reinitializes it with the same capacity.
+ * Sets the index to 0, effectively clearing the string,
+ * but does not deallocate or modify the buffer.
  *
  * \param builder Pointer to the string_builder_t to reset.
  */
 inline void reset_string_builder(string_builder_t *builder)
 {
-    destroy_string_builder(builder);
-    init_string_builder(builder, builder->capacity);
+    builder->idx = 0; // Reset the index to 0
 }
 
 #if defined(__cplusplus)
