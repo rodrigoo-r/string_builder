@@ -24,7 +24,11 @@ extern "C"
 {
 #endif
 
-#include <stddef.h>
+#ifndef FLUENT_LIBC_RELEASE
+#   include <types.h> // fluent_libc
+#else
+#   include <fluent/types/types.h> // fluent_libc
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -54,7 +58,7 @@ typedef struct
  * \param capacity Initial capacity of the buffer (excluding null terminator).
  * \param growth_factor Growth factor for resizing the buffer.
  */
-inline void init_string_builder(string_builder_t *builder, const size_t capacity, double growth_factor)
+inline void init_string_builder(string_builder_t *builder, const size_t capacity, const double growth_factor)
 {
     builder->capacity = capacity;
 
@@ -105,7 +109,17 @@ inline char *collect_string_builder_no_copy(const string_builder_t *builder)
 inline char *collect_string_builder(const string_builder_t *builder)
 {
     // Copy the string
-    return strdup(collect_string_builder_no_copy(builder));
+    char *copy = malloc(sizeof(char) * (builder->idx + 1)); // +1 for null terminator
+    if (copy == NULL)
+    {
+        return NULL; // Return NULL if memory allocation fails
+    }
+
+    // Use memcpy to copy the string
+    memcpy(copy, builder->buf, sizeof(char) * builder->idx);
+    copy[builder->idx] = '\0'; // Add null terminator
+
+    return copy;
 }
 
 /**
