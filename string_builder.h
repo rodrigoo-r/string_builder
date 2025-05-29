@@ -58,7 +58,7 @@ typedef struct
  * \param capacity Initial capacity of the buffer (excluding null terminator).
  * \param growth_factor Growth factor for resizing the buffer.
  */
-inline void init_string_builder(string_builder_t *builder, const size_t capacity, const double growth_factor)
+static inline void init_string_builder(string_builder_t *builder, const size_t capacity, const double growth_factor)
 {
     builder->capacity = capacity;
 
@@ -90,7 +90,7 @@ inline void init_string_builder(string_builder_t *builder, const size_t capacity
  * \param builder Pointer to the string_builder_t.
  * \return Pointer to the internal buffer (null-terminated string).
  */
-inline char *collect_string_builder_no_copy(const string_builder_t *builder)
+static inline char *collect_string_builder_no_copy(const string_builder_t *builder)
 {
     // Add a null terminator
     builder->buf[builder->idx] = '\0';
@@ -106,7 +106,7 @@ inline char *collect_string_builder_no_copy(const string_builder_t *builder)
  * \param builder Pointer to the string_builder_t.
  * \return Newly allocated null-terminated string.
  */
-inline char *collect_string_builder(const string_builder_t *builder)
+static inline char *collect_string_builder(const string_builder_t *builder)
 {
     // Copy the string
     char *copy = malloc(sizeof(char) * (builder->idx + 1)); // +1 for null terminator
@@ -131,7 +131,7 @@ inline char *collect_string_builder(const string_builder_t *builder)
  * \param builder Pointer to the string_builder_t.
  * \param c Character to append.
  */
-inline void write_char_string_builder(string_builder_t *builder, const char c)
+static inline void write_char_string_builder(string_builder_t *builder, const char c)
 {
     // Check if we have to reallocate the buffer
     if (builder->idx == builder->capacity)
@@ -169,7 +169,7 @@ inline void write_char_string_builder(string_builder_t *builder, const char c)
  * \param builder Pointer to the string_builder_t.
  * \param str Null-terminated string to append.
  */
-inline void write_string_builder(string_builder_t *builder, const char *str)
+static inline void write_string_builder(string_builder_t *builder, const char *str)
 {
     // Iterate over the string
     while (*str != '\0')
@@ -188,7 +188,7 @@ inline void write_string_builder(string_builder_t *builder, const char *str)
  *
  * \param builder Pointer to the string_builder_t to destroy.
  */
-inline void destroy_string_builder(string_builder_t *builder)
+static inline void destroy_string_builder(string_builder_t *builder)
 {
     // Make sure the buffer is not NULL
     if (builder->buf == NULL) return;
