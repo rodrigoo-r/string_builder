@@ -63,7 +63,7 @@ static inline void init_string_builder(string_builder_t *builder, const size_t c
     builder->capacity = capacity;
 
     // Allocate a new buffer (+1 for null terminator)
-    char *buf = (char *) malloc(sizeof(char) * (capacity + 1));
+    char *buf = (char *)malloc(sizeof(char) * (capacity + 1));
 
     // Check if we got NULL
     if (buf == NULL)
@@ -109,7 +109,7 @@ static inline char *collect_string_builder_no_copy(const string_builder_t *build
 static inline char *collect_string_builder(const string_builder_t *builder)
 {
     // Copy the string
-    char *copy = malloc(sizeof(char) * (builder->idx + 1)); // +1 for null terminator
+    char *copy = (char *)malloc(sizeof(char) * (builder->idx + 1)); // +1 for null terminator
     if (copy == NULL)
     {
         return NULL; // Return NULL if memory allocation fails
@@ -140,7 +140,7 @@ static inline void write_char_string_builder(string_builder_t *builder, const ch
         builder->capacity *= builder->growth_factor;
 
         // Reallocate immediately (+1 for null terminator)
-        char *new_buffer = (char *) realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
+        char *new_buffer = (char *)realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
 
         // Check if we got NULL
         if (new_buffer == NULL)
