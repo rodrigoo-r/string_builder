@@ -171,13 +171,52 @@ static inline void write_char_string_builder(string_builder_t *builder, const ch
  */
 static inline void write_string_builder(string_builder_t *builder, const char *str)
 {
-    // Iterate over the string
-    while (*str != '\0')
+    // Define the total copied length
+    size_t copied_total = 0;
+
+    // Copy the string until we reach the end or the capacity
+    while (1)
     {
-        // Write the character
-        write_char_string_builder(builder, *str);
-        // Move to the next character
-        str++;
+        size_t remaining = builder->capacity - builder->idx;
+
+        // Rapidly find the length of the input string
+        const char *null_pos = strchr(str, '\0');
+
+        if (null_pos)
+        {
+            // We can copy the rest without the null terminator
+            const size_t to_copy = null_pos - str;
+            memcpy(builder->buf + builder->idx, str, to_copy);
+            builder->idx += to_copy;
+            copied_total += to_copy;
+            break; // Exit the loop after copying the string
+        }
+
+        // Only copy what fits in the remaining capacity
+        memcpy(builder->buf + builder->idx, str, remaining);
+        builder->idx += remaining;
+        copied_total += remaining;
+        str += remaining; // Move the pointer forward
+
+        // Rellocate if we reach the capacity
+        if (builder->idx == builder->capacity)
+        {
+            // Multiply by the growth factor
+            builder->capacity *= builder->growth_factor;
+
+            // Reallocate immediately (+1 for null terminator)
+            const char *new_buffer = (char *)realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
+
+            // Check if we got NULL
+            if (new_buffer == NULL)
+            {
+                perror("Failed to reallocate memory for string builder");
+                exit(1);
+            }
+
+            // Update the buffer pointer
+            builder->buf = (char *)new_buffer;
+        }
     }
 }
 
