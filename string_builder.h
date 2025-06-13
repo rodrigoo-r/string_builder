@@ -177,7 +177,7 @@ static inline void write_string_builder(string_builder_t *builder, const char *s
     // Copy the string until we reach the end or the capacity
     while (1)
     {
-        size_t remaining = builder->capacity - builder->idx;
+        const size_t remaining = builder->capacity - builder->idx;
 
         // Rapidly find the length of the input string
         const char *null_pos = strchr(str, '\0');
