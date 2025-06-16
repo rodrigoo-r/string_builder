@@ -245,7 +245,7 @@ static inline void destroy_string_builder(string_builder_t *builder)
  *
  * \param builder Pointer to the string_builder_t to reset.
  */
-inline void reset_string_builder(string_builder_t *builder)
+static inline void reset_string_builder(string_builder_t *builder)
 {
     builder->idx = 0; // Reset the index to 0
 }
