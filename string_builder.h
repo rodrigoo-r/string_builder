@@ -123,6 +123,37 @@ static inline char *collect_string_builder(const string_builder_t *builder)
 }
 
 /**
+ * \brief Reallocates the buffer of the string_builder_t to accommodate more characters.
+ *
+ * Increases the capacity of the builder by multiplying it with the growth_factor,
+ * then reallocates the buffer to the new capacity (+1 for the null terminator).
+ * If memory allocation fails, prints an error message and exits the program.
+ *
+ * \param builder Pointer to the string_builder_t whose buffer will be reallocated.
+ */
+static void reallocate_string_builder(string_builder_t *builder)
+{
+    // Grow the capacity
+    builder->capacity *= builder->growth_factor;
+
+    // Reallocate immediately (+1 for null terminator)
+    char *new_buffer = (char *)realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
+
+    // Check if we got NULL
+    if (new_buffer == NULL)
+    {
+#       ifndef _WIN32
+        perror("realloc");
+#       else
+        puts("Runtime error: Out of memory");
+#       endif
+        exit(1);
+    }
+
+    builder->buf = new_buffer;
+}
+
+/**
  * \brief Appends a single character to the string_builder_t.
  *
  * Automatically reallocates the buffer if needed.
@@ -136,29 +167,54 @@ static inline void write_char_string_builder(string_builder_t *builder, const ch
     // Check if we have to reallocate the buffer
     if (builder->idx == builder->capacity)
     {
-        // Double the capacity
-        builder->capacity *= builder->growth_factor;
-
-        // Reallocate immediately (+1 for null terminator)
-        char *new_buffer = (char *)realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
-
-        // Check if we got NULL
-        if (new_buffer == NULL)
-        {
-#       ifndef _WIN32
-            perror("realloc");
-#       else
-            puts("Runtime error: Out of memory");
-#       endif
-            exit(1);
-        }
-
-        builder->buf = new_buffer;
+        reallocate_string_builder(builder);
     }
+
 
     // Write the character to the buffer
     builder->buf[builder->idx] = c;
     builder->idx++;
+}
+
+/**
+ * \brief Appends up to n characters from a given string to the string_builder_t.
+ *
+ * Copies at most n characters from the input string \p str into the builder's buffer.
+ * Automatically reallocates the buffer as needed to accommodate all characters.
+ * Assumes that \p str is at least n bytes long.
+ *
+ * \param builder Pointer to the string_builder_t.
+ * \param str Pointer to the source string (not necessarily null-terminated).
+ * \param n Number of characters to append from \p str.
+ */
+static inline void write_string_builder_ranged(string_builder_t *builder, const char *str, const size_t n)
+{
+    // NOTE: We assume that str is at least n bytes long
+    // Copy all characters
+    size_t remaining_write = n;
+    while (remaining_write > 0)
+    {
+        // Check how many bytes we can write
+        const size_t space_left = builder->capacity - builder->idx;
+        if (space_left == 0)
+        {
+            reallocate_string_builder(builder);
+        }
+
+        // Check if we can write all remaining characters
+        if (space_left >= remaining_write)
+        {
+            // Copy the remaining characters
+            memcpy(builder->buf + builder->idx, str, remaining_write);
+            break;
+        }
+
+        // Copy only what fits
+        memcpy(builder->buf + builder->idx, str, space_left);
+        builder->idx += space_left; // Update the index
+        str += space_left; // Move the pointer forward
+        remaining_write -= space_left; // Decrease the remaining characters to write
+    }
 }
 
 /**
@@ -171,53 +227,7 @@ static inline void write_char_string_builder(string_builder_t *builder, const ch
  */
 static inline void write_string_builder(string_builder_t *builder, const char *str)
 {
-    // Define the total copied length
-    size_t copied_total = 0;
-
-    // Copy the string until we reach the end or the capacity
-    while (1)
-    {
-        const size_t remaining = builder->capacity - builder->idx;
-
-        // Rapidly find the length of the input string
-        const char *null_pos = strchr(str, '\0');
-
-        if (null_pos)
-        {
-            // We can copy the rest without the null terminator
-            const size_t to_copy = null_pos - str;
-            memcpy(builder->buf + builder->idx, str, to_copy);
-            builder->idx += to_copy;
-            copied_total += to_copy;
-            break; // Exit the loop after copying the string
-        }
-
-        // Only copy what fits in the remaining capacity
-        memcpy(builder->buf + builder->idx, str, remaining);
-        builder->idx += remaining;
-        copied_total += remaining;
-        str += remaining; // Move the pointer forward
-
-        // Rellocate if we reach the capacity
-        if (builder->idx == builder->capacity)
-        {
-            // Multiply by the growth factor
-            builder->capacity *= builder->growth_factor;
-
-            // Reallocate immediately (+1 for null terminator)
-            const char *new_buffer = (char *)realloc(builder->buf, sizeof(char) * (builder->capacity + 1));
-
-            // Check if we got NULL
-            if (new_buffer == NULL)
-            {
-                perror("Failed to reallocate memory for string builder");
-                exit(1);
-            }
-
-            // Update the buffer pointer
-            builder->buf = (char *)new_buffer;
-        }
-    }
+    write_string_builder_ranged(builder, str, strlen(str));
 }
 
 /**
