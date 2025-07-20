@@ -206,6 +206,9 @@ static inline void write_string_builder_ranged(string_builder_t *builder, const 
         {
             // Copy the remaining characters
             memcpy(builder->buf + builder->idx, str, remaining_write);
+
+            // Move the index forward
+            builder->idx += remaining_write;
             break;
         }
 
